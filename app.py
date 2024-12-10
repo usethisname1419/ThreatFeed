@@ -7,6 +7,7 @@ import threading
 import time
 import json
 from termcolor import colored
+from collections import Counter
 # Configuration
 DEFAULT_FEED = {
     "name": "URLHaus",
@@ -24,7 +25,11 @@ current_feed_data = []
 start_idx = 0  # Keeps track of where to resume from
 SCROLL_DELAY = 1
 stop_flag = False
-
+processed_rows = 0
+skipped_rows = 0
+url_counter = Counter()  # To store URL counts
+report_counter = Counter()  # To store report counts
+flag_counter = Counter()  # To store flag counts
 # Functions
 def fetch_feed(feed):
     headers = {"Authorization": f"Bearer {feed['api_key']}"} if feed.get("api_key") else {}
@@ -52,6 +57,8 @@ def start_feed(feed, text_widget, status_label):
     stop_flag = False  # Reset stop flag when starting a new feed
     is_running = True
     current_feed_data = []
+    processed_rows = 0  # Reset processed rows
+    skipped_rows = 0  # Reset skipped rows
     if not is_paused:  # Reset start index only when starting fresh, not when resuming
         start_idx = 0  
     is_paused = False  # Reset paused state when starting fresh
@@ -62,7 +69,7 @@ def start_feed(feed, text_widget, status_label):
     
 
     def process_feed():
-        global is_running, start_idx, is_paused, stop_flag
+        global is_running, start_idx, is_paused, stop_flag, processed_rows, skipped_rows
         data = fetch_feed(feed)
     
         if data:
@@ -85,6 +92,12 @@ def start_feed(feed, text_widget, status_label):
                     if len(row) < 9:
                         print(f"Skipping row {idx + 1} due to insufficient data: {row}")
                         continue  # Skip rows with insufficient data
+                    processed_rows += 1  # Increment processed rows counter
+
+                    # Track the counts of URLs, reports, and flags
+                    url_counter[row[2]] += 1  # Assuming row[1] is the URL field
+                    report_counter[row[8]] += 1  # Assuming row[2] is the report field
+                    flag_counter[row[6]] += 1  # Assuming row[3] is the flag field
 
                 # Print separator and threat index in the console
                     text_widget.insert(tk.END, "################################################################################\n")
@@ -118,7 +131,6 @@ def start_feed(feed, text_widget, status_label):
     threading.Thread(target=process_feed, daemon=True).start()
 
 
-
 def stop_feed(status_label):
     global is_running, stop_flag
     if is_running:
@@ -141,6 +153,10 @@ def resume_feed(feed, text_widget, status_label):
         status_label.config(text=f"Status: Resumed - {feed['name']}")
         start_feed(feed, text_widget, status_label)  # Just call start_feed to continue from where we left off
 
+def load_metrics_button(root):
+    # Create and place the button to show the metrics
+    metrics_button = ttk.Button(root, text="Show Metrics", command=show_metrics)
+    metrics_button.pack(side=tk.left, padx=5, pady=5)
 
 def find_in_feed(query):
     global current_feed_data
@@ -203,7 +219,7 @@ def export_to_csv():
 class ThreatFeedApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Threat Feed Viewer")
+        self.root.title("Threat Feed Viewer - LTH Cybersecurity")
         self.root.geometry("800x600")
 
         # Toolbar
@@ -212,6 +228,7 @@ class ThreatFeedApp:
         feed_menu.add_command(label="Add Feed", command=lambda: self.add_feed())
         feed_menu.add_command(label="Export Data", command=export_to_csv)
         menubar.add_cascade(label="Sources", menu=feed_menu)
+        menubar.add_command(label="Show Metrics", command=self.calculate_and_display_metrics)
         self.root.config(menu=menubar)
 
         # Feed Display
@@ -344,6 +361,41 @@ class ThreatFeedApp:
             return True
         except requests.RequestException:
             return False
+            
+    def calculate_and_display_metrics(self):
+        global url_counter, report_counter, flag_counter
+    
+    # Calculate top 5 for each category
+        top_urls = url_counter.most_common(5)
+        top_reporters = report_counter.most_common(5)
+        top_flags = flag_counter.most_common(5)
+    
+    # Display metrics in a pop-up window
+        metrics_window = tk.Toplevel()
+        metrics_window.title("Top Metrics")
+        metrics_window.geometry("400x300")
+    
+        metrics_text = ScrolledText(metrics_window, wrap=tk.WORD, state=tk.NORMAL, font=("Courier", 10))
+        metrics_text.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+    
+        metrics_text.insert(tk.END, "Top 5 URLs:\n")
+        for url, count in top_urls:
+            metrics_text.insert(tk.END, f"{url}: {count}\n")
+    
+        metrics_text.insert(tk.END, "\nTop 5 Reporters:\n")
+        for reporter, count in top_reporters:
+            metrics_text.insert(tk.END, f"{reporter}: {count}\n")
+    
+        metrics_text.insert(tk.END, "\nTop 5 Tags:\n")
+        for flag, count in top_flags:
+            metrics_text.insert(tk.END, f"{flag}: {count}\n")
+    
+        metrics_text.config(state=tk.DISABLED)  # Make text read-only
+
+    def show_metrics(self):
+        calculate_and_display_metrics()
+
+
 
 
 if __name__ == "__main__":
