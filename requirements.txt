@@ -1,2 +1,6 @@
 termcolor
 requests
+tk
+json
+time
+csv
