@@ -94,17 +94,21 @@ def start_feed(feed, text_widget, status_label):
                         continue  # Skip rows with insufficient data
                     processed_rows += 1  # Increment processed rows counter
 
-                    # Track the counts of URLs, reports, and flags
-                    url_counter[row[2]] += 1  # Assuming row[1] is the URL field
+                    url = row[2]  # Extract the URL from the row
+                    parsed_url = urlparse(url)  # Parse the URL to separate components
+                    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"  # Combine scheme and netloc for the base URL
+
+
+                    url_counter[base_url] += 1
                     report_counter[row[8]] += 1  # Assuming row[2] is the report field
                     flag_counter[row[6]] += 1  # Assuming row[3] is the flag field
 
-                # Print separator and threat index in the console
+             
                     text_widget.insert(tk.END, "################################################################################\n")
                     text_widget.insert(tk.END, f"Threat {start_idx + 1}:", "cyan")
                     text_widget.insert(tk.END, "\n")
 
-                    # Apply colored labels for each field
+                 
                     text_widget.insert(tk.END, f"ID: {row[0]}\n", "yellow")
                     text_widget.insert(tk.END, f"Date Added: {row[1]}\n", "yellow")
                     text_widget.insert(tk.END, f"URL: {row[2]}\n", "yellow")
@@ -118,7 +122,7 @@ def start_feed(feed, text_widget, status_label):
                 
                     text_widget.see(tk.END)
                 
-                # Increment start_idx and add a delay before moving to the next threat
+               
                     start_idx += 1
                     time.sleep(SCROLL_DELAY)  # Delay of 1 second per threat
 
