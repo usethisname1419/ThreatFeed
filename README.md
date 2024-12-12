@@ -3,6 +3,24 @@ Python free threat feed
 
 GUI app is under development:
 
+## Usage
+
+You can run the basic cli based feed by running 
+
+`python3 feed.py`
+
+The GUI app is available by installing requirements in a venv
+
+`python3 -m venv feed`
+
+`source feed/bin/activate`
+
+`pip install -r requirements.txt`
+
+Then you can run the feed by running
+
+`python3 app.py`
+
 # features
 
 - This threat feed displays URLhaus data in a scrolling fashion.
