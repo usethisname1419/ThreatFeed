@@ -33,7 +33,11 @@ Pause and resume -
   
 - I'd also like to fix these issues
 
+- I'd like to make a feature with UFW block. Where you click it and a shell script automatically creates rules to block the top 5 URLs for 90 days
+
 
 # You can help!
 
 I'd would like somebody to help me out in fixing these issues, especially the dynamic generation of data.(stack overflow always does not help most of the time and make stupid comments)
+
+Reach out to me at dereksamjohnston@gmail.com if you would like to offer assistance in making this better and actually be useful
