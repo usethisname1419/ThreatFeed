@@ -59,3 +59,5 @@ Pause and resume -
 I'd would like somebody to help me out in fixing these issues, especially the dynamic generation of data.(stack overflow always does not help most of the time and make stupid comments)
 
 Reach out to me at dereksamjohnston@gmail.com if you would like to offer assistance in making this better and actually be useful
+
+If you think this is a good tool or would like to ensure updates and upgrades, please support BTC: `bc1qtezfajhysn6dut07m60vtg0s33jy8tqcvjqqzk`
