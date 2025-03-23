@@ -29,6 +29,9 @@ Then you can run the feed by running
 
 - Basic metrics: top 5 URL, top 5 reporters, top 5 tags
 
+# CVE-feed
+
+this feed is for recentlt published CVEs from NIST, you need to request an api key from nist and enter it in the script
 
 
 # Issues:
