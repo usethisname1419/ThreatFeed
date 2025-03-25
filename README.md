@@ -31,7 +31,16 @@ Then you can run the feed by running
 
 # CVE-feed
 
-this feed is for recentlt published CVEs from NIST, you need to request an api key from nist and enter it in the script
+CVE feed -
+
+  CVE feed uses NIST API to display newly found CVE's
+  
+  Uses shodan to search systems using CVE data
+
+
+  Requires 
+  NIST API
+  Shodan API
 
 
 # Issues:
